@@ -124,7 +124,7 @@
 					6314C00C1ED56807000AFC0B = {
 						CreatedOnToolsVersion = 8.0;
 						DevelopmentTeam = J626X6WL96;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
 								enabled = 1;
@@ -300,6 +300,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.bitcanny.GeoFenceMonitoring;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "4efde04c-92b6-4129-a4da-dbdfbc658924";
+				PROVISIONING_PROFILE_SPECIFIER = GeoFenceMonitoringDev;
 			};
 			name = Debug;
 		};
@@ -313,6 +315,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.bitcanny.GeoFenceMonitoring;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "4efde04c-92b6-4129-a4da-dbdfbc658924";
+				PROVISIONING_PROFILE_SPECIFIER = GeoFenceMonitoringDev;
 			};
 			name = Release;
 		};
