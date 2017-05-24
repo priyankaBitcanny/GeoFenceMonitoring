@@ -10,6 +10,7 @@
 
 @interface ViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,UITextFieldDelegate,UIPickerViewDelegate,UIPickerViewDataSource>{
     long selectedAccuracyIndex;
+    long selectedIndex;
 }
 
 @property (strong, nonatomic) NSMutableDictionary * latLongDic;

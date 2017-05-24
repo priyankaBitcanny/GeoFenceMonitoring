@@ -219,6 +219,31 @@ AppDelegate * appDelegate;
     
 }
 
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    selectedIndex = indexPath.row;
+    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Would you like delete home?"
+                                                        message:@""
+                                                       delegate:self
+                                              cancelButtonTitle:@"Cancel"
+                                              otherButtonTitles:@"Delete",nil];
+    [alertView show];
+}
+
+#pragma mark- alertview delegate
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+    NSLog(@"buttonIndex %ld",buttonIndex);
+    if (buttonIndex==1) {//delete
+        [self.latLongDic removeObjectForKey:[[self.latLongDic allKeys] objectAtIndex:selectedIndex]];
+        [Utility setLatLongDic:self.latLongDic];
+        [self.hubTableView reloadData];
+    }
+    else{
+        
+    }
+    
+}
+
 @end
 
 

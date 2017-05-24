@@ -20,26 +20,29 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     
-    if ([UIDevice currentDevice].systemVersion.floatValue >= 8.0) {
-        UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeBadge | UIUserNotificationTypeAlert | UIUserNotificationTypeSound categories:nil];
-        [application registerUserNotificationSettings:settings];
-    }
-    
-    if(![Utility getGeoFenceRadius]){
-        [Utility setGeoFenceRadius:@"130"];
-    }
-    if(![Utility getGeoFenceAccuracy]){
-        [Utility setGeoFenceAccuracy:@"4.0"];
-    }
-    self.fenceRadius = [[Utility getGeoFenceRadius] floatValue];
-    self.fenceAccuracy = [[Utility getGeoFenceAccuracy] floatValue];
-    
     NSDictionary* locationInfo = [launchOptions objectForKey:UIApplicationLaunchOptionsLocationKey];
     if (locationInfo != nil){
         NSLog(@"App luanched for location info %@",locationInfo);
         [self configureLocationService];
     }
-    isUpdatingFromHome = @"0";
+    else{
+        NSLog(@"App luanched normally");
+        if ([UIDevice currentDevice].systemVersion.floatValue >= 8.0) {
+            UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeBadge | UIUserNotificationTypeAlert | UIUserNotificationTypeSound categories:nil];
+            [application registerUserNotificationSettings:settings];
+        }
+        
+        if(![Utility getGeoFenceRadius]){
+            [Utility setGeoFenceRadius:@"130"];
+        }
+        if(![Utility getGeoFenceAccuracy]){
+            [Utility setGeoFenceAccuracy:@"4.0"];
+        }
+        self.fenceRadius = [[Utility getGeoFenceRadius] floatValue];
+        self.fenceAccuracy = [[Utility getGeoFenceAccuracy] floatValue];
+        isUpdatingFromHome = @"0";
+    }
+    
     
     
     
@@ -49,16 +52,50 @@
 #pragma mark - Local Notification
 
 -(void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification{
+    NSLog(@"didReceiveLocalNotification");
     [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
 }
 
 
 #pragma mark - Core Location
 
+-(void)initialiseLocationManager{
+    NSLog(@"initialiseLocationManager");
+    self.locationManager = [[CLLocationManager alloc] init];
+    [self.locationManager setDelegate:self];
+    self.locationManager.allowsBackgroundLocationUpdates=YES;
+    [self setLocationManagerAccuracy];
+}
+
+- (void)configureLocationService
+{
+    NSLog(@"configureLocationService");
+    if (!self.locationManager) {
+        [self initialiseLocationManager];
+    }
+    
+    switch ([CLLocationManager authorizationStatus])
+    {
+        case kCLAuthorizationStatusNotDetermined:
+        case kCLAuthorizationStatusAuthorizedWhenInUse:
+            if ([self.locationManager respondsToSelector:@selector(requestAlwaysAuthorization)])
+            {
+                [self.locationManager requestAlwaysAuthorization];
+            }
+            break;
+        case kCLAuthorizationStatusAuthorizedAlways:
+            break;
+        case kCLAuthorizationStatusDenied:
+        case kCLAuthorizationStatusRestricted:
+            [self showAlertViewWithTitle:@"Sorry" andMessage:@"Location Services are not enabled on this device."];
+            break;
+            
+    }
+}
+
 -(BOOL)isLocationServiceEnabled
 {
     BOOL isEnabled = NO;
-    
     if ([CLLocationManager locationServicesEnabled])
     {
         switch ([CLLocationManager authorizationStatus])
@@ -77,23 +114,23 @@
                 break;
         }
     }
-    
+    NSLog(@"isLocationServiceEnabled %d",isEnabled);
     return isEnabled;
 }
 
 - (void)startUpdatingUserLocation{
     
     currentLocation = nil;
-    
+    NSLog(@"startUpdatingUserLocation");
     if([self isLocationServiceEnabled]){
+        NSLog(@"LocationServiceEnabled");
         if (!self.locationManager) {
             [self initialiseLocationManager];
         }
-        /*self.fenceAccuracy=2;
-         [self setLocationManagerAccuracy];*/
         [self.locationManager startUpdatingLocation];
     }
     else{
+        NSLog(@"LocationService not Enabled");
         if ([CLLocationManager locationServicesEnabled]){
             if ([CLLocationManager authorizationStatus]==kCLAuthorizationStatusNotDetermined){
                 [self configureLocationService];
@@ -125,39 +162,8 @@
     }
 }
 
--(void)initialiseLocationManager{
-    self.locationManager = [[CLLocationManager alloc] init];
-    [self.locationManager setDelegate:self];
-    self.locationManager.allowsBackgroundLocationUpdates=YES;
-    [self setLocationManagerAccuracy];
-}
-
-- (void)configureLocationService
-{
-    if (!self.locationManager) {
-        [self initialiseLocationManager];
-    }
-    
-    switch ([CLLocationManager authorizationStatus])
-    {
-        case kCLAuthorizationStatusNotDetermined:
-        case kCLAuthorizationStatusAuthorizedWhenInUse:
-            if ([self.locationManager respondsToSelector:@selector(requestAlwaysAuthorization)])
-            {
-                [self.locationManager requestAlwaysAuthorization];
-            }
-            break;
-        case kCLAuthorizationStatusAuthorizedAlways:
-            break;
-        case kCLAuthorizationStatusDenied:
-        case kCLAuthorizationStatusRestricted:
-            [self showAlertViewWithTitle:@"Sorry" andMessage:@"Location Services are not enabled on this device."];
-            break;
-            
-    }
-}
-
 - (void)locationManager:(CLLocationManager*)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)locstatus {
+    NSLog(@"didChangeAuthorizationStatus %d",locstatus);
     switch (locstatus) {
         case kCLAuthorizationStatusNotDetermined:
             break;
@@ -168,8 +174,6 @@
         case kCLAuthorizationStatusAuthorizedWhenInUse:
             break;
         case kCLAuthorizationStatusAuthorizedAlways: {
-            /*self.fenceAccuracy=2;
-             [self setLocationManagerAccuracy];*/
             [self.locationManager startUpdatingLocation];
         }
             break;
@@ -219,6 +223,7 @@
     CLLocationDistance distanceThreshold = 2.0; // in meters
     if (!currentLocation || [currentLocation distanceFromLocation:newLocation] > distanceThreshold)
     {
+        NSLog(@"Got location");
         currentLocation = newLocation;
         [self.locationManager stopUpdatingLocation];
         
@@ -314,6 +319,8 @@
                 }
                 else{
                     shallFormNewRegion = NO;
+                    //region exists.... check position and update
+                    [self checkRegionStatus:region];
                 }
                 
                 break;
@@ -358,7 +365,7 @@ BOOL CLLocationCoordinateEqual(CLLocationCoordinate2D coordinate1, CLLocationCoo
 
 
 -(void)createNewRegionToTrack:(NSString *)home{
-    
+    NSLog(@"createNewRegionToTrack");
     NSMutableDictionary * latLongDic = [[NSMutableDictionary alloc] initWithDictionary:[Utility getLatLongDic]];
     NSArray * latlongArr = [[latLongDic objectForKey:home] componentsSeparatedByString:@","];
     
@@ -375,29 +382,34 @@ BOOL CLLocationCoordinateEqual(CLLocationCoordinate2D coordinate1, CLLocationCoo
     else{
         NSLog(@"Monitoring NOT Available");
     }
+    [self checkRegionStatus:region];
     
+}
+
+-(void)checkRegionStatus:(CLRegion *)region{
+    NSString * statusStr = @"exited";
     if ([region containsCoordinate:CLLocationCoordinate2DMake(currentLocation.coordinate.latitude, currentLocation.coordinate.longitude)]) {
-        
-        //App is in foreground. Act on it.
-        UIApplicationState state = [[UIApplication sharedApplication] applicationState];
-        
-        if (state == UIApplicationStateActive) {
-            //App is in foreground. Act on it.
-            [self showAlertViewWithTitle:@"" andMessage:[NSString stringWithFormat:@"You have entered the region for %@" ,region.identifier]];
-        }
-        else{
-            UILocalNotification* localNotification = [[UILocalNotification alloc] init];
-            localNotification.alertBody = [NSString stringWithFormat:@"You have entered the region for %@" ,region.identifier];
-            localNotification.timeZone = [NSTimeZone defaultTimeZone];
-            localNotification.fireDate = [NSDate dateWithTimeIntervalSinceNow:0];
-            [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
-        }
+        statusStr = @"entered";
     }
+    //App is in foreground. Act on it.
+    UIApplicationState state = [[UIApplication sharedApplication] applicationState];
     
+    if (state == UIApplicationStateActive) {
+        //App is in foreground. Act on it.
+        [self showAlertViewWithTitle:@"" andMessage:[NSString stringWithFormat:@"You have %@ the region for %@" ,statusStr,region.identifier]];
+    }
+    else{
+        UILocalNotification* localNotification = [[UILocalNotification alloc] init];
+        localNotification.alertBody = [NSString stringWithFormat:@"You have %@ the region for %@",statusStr ,region.identifier];
+        localNotification.timeZone = [NSTimeZone defaultTimeZone];
+        localNotification.fireDate = [NSDate dateWithTimeIntervalSinceNow:0];
+        [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
+    }
 }
 
 - (void)clearGeofences
 {
+    NSLog(@"clearGeofences");
     if (!self.locationManager) {
         [self initialiseLocationManager];
     }
