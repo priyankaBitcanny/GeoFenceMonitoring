@@ -39,6 +39,7 @@ AppDelegate * appDelegate;
     //------tableview--------
     self.latLongDic = [[NSMutableDictionary alloc] initWithDictionary:[Utility getLatLongDic]];
     NSLog(@"\n startUpdatingUserLocation from didload");
+    appDelegate.needToSetUpGeofence = @"1";
     [appDelegate startUpdatingUserLocation];
     self.hubTableView.delegate=self;
     self.hubTableView.dataSource=self;
@@ -73,8 +74,8 @@ AppDelegate * appDelegate;
 
 
 - (IBAction)CurrLocOnClick:(id)sender {
-    appDelegate.isUpdatingFromHome = @"1";
     NSLog(@"\n startUpdatingUserLocation on CurrLocOnClick");
+    appDelegate.isUpdatingFromHome = @"1";
     [appDelegate startUpdatingUserLocation];
 }
 
@@ -84,6 +85,7 @@ AppDelegate * appDelegate;
         [self.latLongDic setObject:self.currLocTF.text forKey:self.hubnameTF.text];
         [Utility setLatLongDic:self.latLongDic];
         NSLog(@"\n startUpdatingUserLocation on creating hub");
+        appDelegate.needToSetUpGeofence = @"1";
         [appDelegate startUpdatingUserLocation];
         self.currLocTF.text=@"";
         self.hubnameTF.text=@"";
@@ -135,6 +137,7 @@ AppDelegate * appDelegate;
     
     [appDelegate stopMonitoringGeoFences];
     NSLog(@"\n startUpdatingUserLocation accuracy changed");
+    appDelegate.needToSetUpGeofence = @"1";
     [appDelegate startUpdatingUserLocation];
 }
 

@@ -15,7 +15,7 @@
 
 @implementation AppDelegate
 
-@synthesize currentLocation,isUpdatingFromHome;
+@synthesize currentLocation,isUpdatingFromHome,needToSetUpGeofence;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
@@ -41,6 +41,7 @@
         self.fenceRadius = [[Utility getGeoFenceRadius] floatValue];
         self.fenceAccuracy = [[Utility getGeoFenceAccuracy] floatValue];
         isUpdatingFromHome = @"0";
+        needToSetUpGeofence = @"0";
     }
     
     
@@ -232,8 +233,9 @@
             isUpdatingFromHome = @"0";
             [[NSNotificationCenter defaultCenter] postNotificationName:@"NotificationSetCurrentLocation" object:nil];
         }
-        else{
+        else if([needToSetUpGeofence isEqualToString:@"1"]){
             NSLog(@"Got location to setUpGeofences");
+            needToSetUpGeofence = @"0";
             [self setUpGeofences];
         }
         

@@ -15,7 +15,7 @@
 
 @property (strong, nonatomic) CLLocation *currentLocation;
 
-@property (strong, nonatomic) NSString * isUpdatingFromHome;
+@property (strong, nonatomic) NSString * isUpdatingFromHome, * needToSetUpGeofence;
 
 @property (strong, nonatomic) CLLocationManager *locationManager;
 
