@@ -117,9 +117,9 @@ AppDelegate * appDelegate;
         NSLog(@"\n startUpdatingUserLocation on creating hub");
         appDelegate.needToSetUpGeofence = @"1";
         [appDelegate startUpdatingUserLocation];
+        [self showAlertViewWithTitle:@"Hub added" andMessage:[NSString stringWithFormat:@"Monitoring started for %@",self.hubnameTF.text]];
         self.currLocTF.text=@"";
         self.hubnameTF.text=@"";
-        [self showAlertViewWithTitle:@"Hub added" andMessage:@"Monitoring started for added hub"];
         [self.hubTableView reloadData];
     }
     else{
@@ -200,7 +200,7 @@ AppDelegate * appDelegate;
     CGFloat width = CGRectGetWidth(tableView.bounds);
     CGFloat height = [self tableView:tableView heightForHeaderInSection:section];
     UIView *container = [[UIView alloc] initWithFrame:CGRectMake(0,0,width,height)] ;
-    container.backgroundColor=[UIColor colorWithRed:(55/255.0) green:(55/255.0) blue:(55/255.0) alpha:1.0];
+    container.backgroundColor=[UIColor colorWithRed:(85/255.0) green:(85/255.0) blue:(85/255.0) alpha:1.0];
     //container.layer.borderWidth=1.0;
     
     UILabel *SlNoLbl =  [[UILabel alloc] init];
