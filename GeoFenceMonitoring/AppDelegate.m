@@ -278,16 +278,16 @@
 
 - (void)locationManager:(CLLocationManager *)manager monitoringDidFailForRegion:(nullable CLRegion *)region
               withError:(NSError *)error{
-    NSLog(@"updateRadius : Monitoring Failed for region : %@ with error : %@", region.identifier,error.localizedDescription);
+    NSLog(@"Monitoring Failed for region : %@ with error : %@", region.identifier,error.userInfo);
 }
 
 - (void)locationManager:(CLLocationManager *)manager didEnterRegion:(CLRegion *)region{
-    NSLog(@"updateRadius : Location manager - distanceFilter : %f accuracy : %f",manager.distanceFilter,manager.desiredAccuracy);
+    NSLog(@"Location didEnterRegion - distanceFilter : %f accuracy : %f",manager.distanceFilter,manager.desiredAccuracy);
     [self showNotificationForRegion:region andType:@"entered" andRadius:YES];
 }
 
 - (void)locationManager:(CLLocationManager *)manager didExitRegion:(CLRegion *)region{
-    NSLog(@"updateRadius : Location manager - distanceFilter : %f accuracy : %f",manager.distanceFilter,manager.desiredAccuracy);
+    NSLog(@"Location didExitRegion - distanceFilter : %f accuracy : %f",manager.distanceFilter,manager.desiredAccuracy);
     [self showNotificationForRegion:region andType:@"exited" andRadius:NO];
 }
 
