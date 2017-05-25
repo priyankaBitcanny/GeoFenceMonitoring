@@ -52,30 +52,34 @@ AppDelegate * appDelegate;
     
 }
 
--(void)reloadTable{
-    [self.hubTableView reloadData];
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
 }
 
-#pragma mark - Dismiss Keyboard
--(void)dismissAllKeyboard {
-    [self.currLocTF resignFirstResponder];
-    [self.hubnameTF resignFirstResponder];
-    [self.radiusTF resignFirstResponder];
-}
-#pragma mark - TextField Delegates
-- (BOOL)textFieldShouldReturn:(UITextField *)textField{
-    [textField resignFirstResponder];
-    return YES;
+#pragma mark - postNotificationMethods
+
+-(void)reloadTable{
+    [self.hubTableView reloadData];
 }
 
 -(void)setCurrentLocation{
     self.currLocTF.text = [NSString stringWithFormat:@"%f,%f",appDelegate.currentLocation.coordinate.latitude,appDelegate.currentLocation.coordinate.longitude];
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+#pragma mark - TextField Delegates
+- (BOOL)textFieldShouldReturn:(UITextField *)textField{
+    [textField resignFirstResponder];
+    return YES;
 }
+
+-(void)dismissAllKeyboard {
+    [self.currLocTF resignFirstResponder];
+    [self.hubnameTF resignFirstResponder];
+    [self.radiusTF resignFirstResponder];
+}
+
 
 #pragma mark - OnClick
 
@@ -95,25 +99,30 @@ AppDelegate * appDelegate;
 
 - (IBAction)createHubOnClick:(id)sender {
     
-    if(self.currLocTF.text.length!=0 && self.hubnameTF.text.length!=0){
-        
-        self.addFenceBtn.enabled=false;
-        [self dismissAllKeyboard];
-        [self performSelector:@selector(addHub) withObject:nil afterDelay:1.0];
-    }
+    self.addFenceBtn.enabled=false;
+    [self dismissAllKeyboard];
+    [self performSelector:@selector(addHub) withObject:nil afterDelay:1.0];
+    
 }
 
 -(void)addHub{
     self.addFenceBtn.enabled=true;
-    [self.latLongDic setObject:self.currLocTF.text forKey:self.hubnameTF.text];
-    [Utility setLatLongDic:self.latLongDic];
-    NSLog(@"\n startUpdatingUserLocation on creating hub");
-    appDelegate.needToSetUpGeofence = @"1";
-    [appDelegate startUpdatingUserLocation];
-    self.currLocTF.text=@"";
-    self.hubnameTF.text=@"";
-    [self showAlertViewWithTitle:@"Hub added" andMessage:@"Monitoring started for added hub"];
-    [self.hubTableView reloadData];
+    
+    if(self.currLocTF.text.length!=0 && self.hubnameTF.text.length!=0 && self.radiusTF.text.length!=0){
+        [self.latLongDic setObject:self.currLocTF.text forKey:self.hubnameTF.text];
+        [Utility setLatLongDic:self.latLongDic];
+        NSLog(@"\n startUpdatingUserLocation on creating hub");
+        appDelegate.needToSetUpGeofence = @"1";
+        [appDelegate startUpdatingUserLocation];
+        self.currLocTF.text=@"";
+        self.hubnameTF.text=@"";
+        [self showAlertViewWithTitle:@"Hub added" andMessage:@"Monitoring started for added hub"];
+        [self.hubTableView reloadData];
+    }
+    else{
+        [self showAlertViewWithTitle:@"Atert" andMessage:@"Fill up all fields"];
+    }
+    
 }
 
 - (IBAction)radiusOnClick:(id)sender {
@@ -133,18 +142,6 @@ AppDelegate * appDelegate;
     NSLog(@"\n startUpdatingUserLocation radius changed");
     appDelegate.needToSetUpGeofence = @"1";
     [appDelegate startUpdatingUserLocation];
-}
-
-- (void)showAlertViewWithTitle:(NSString*)title andMessage:(NSString *)message {
-    
-    UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:title
-                                                       message:message
-                                                      delegate:nil
-                                             cancelButtonTitle:@"OK"
-                                             otherButtonTitles:nil];
-    
-    
-    [alertView show];
 }
 
 #pragma mark- PickerViewdelegate
@@ -291,6 +288,20 @@ AppDelegate * appDelegate;
     }
     
 }
+
+
+- (void)showAlertViewWithTitle:(NSString*)title andMessage:(NSString *)message {
+    
+    UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:title
+                                                       message:message
+                                                      delegate:nil
+                                             cancelButtonTitle:@"OK"
+                                             otherButtonTitles:nil];
+    
+    
+    [alertView show];
+}
+
 
 @end
 
