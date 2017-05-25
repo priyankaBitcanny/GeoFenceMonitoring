@@ -17,6 +17,8 @@
 
 @property (strong, nonatomic) NSMutableArray *accuracyArray;
 
+@property (weak, nonatomic) IBOutlet UILabel *appLbl;
+
 @property (weak, nonatomic) IBOutlet UITextField *currLocTF;
 
 @property (weak, nonatomic) IBOutlet UITextField *hubnameTF;

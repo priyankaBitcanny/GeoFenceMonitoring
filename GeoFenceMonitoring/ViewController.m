@@ -25,6 +25,9 @@ AppDelegate * appDelegate;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(setCurrentLocation) name:@"NotificationSetCurrentLocation" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTable) name:@"NotificationReloadTable" object:nil];
     
+    NSString * appVersionString = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+    NSString * appBuildString = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"];
+    self.appLbl.text = [NSString stringWithFormat:@"GeoFenceMoritor %@(%@)",appVersionString,appBuildString];
     //------- TextFields----------
     self.hubnameTF.delegate=self;
     self.currLocTF.delegate=self;
