@@ -87,6 +87,7 @@ AppDelegate * appDelegate;
 }
 
 -(void)fetchCurrentLocation{
+    self.locationBtn.enabled=true;
     NSLog(@"\n startUpdatingUserLocation on CurrLocOnClick");
     appDelegate.isUpdatingFromHome = @"1";
     [appDelegate startUpdatingUserLocation];
@@ -103,6 +104,7 @@ AppDelegate * appDelegate;
 }
 
 -(void)addHub{
+    self.addFenceBtn.enabled=true;
     [self.latLongDic setObject:self.currLocTF.text forKey:self.hubnameTF.text];
     [Utility setLatLongDic:self.latLongDic];
     NSLog(@"\n startUpdatingUserLocation on creating hub");
@@ -124,6 +126,7 @@ AppDelegate * appDelegate;
 }
 
 -(void)saveRadius{
+    self.saveRadiusBtn.enabled=true;
     [Utility setGeoFenceRadius:self.radiusTF.text];
     appDelegate.fenceAccuracy = [[Utility getGeoFenceRadius] floatValue];
     [appDelegate clearGeofences];
