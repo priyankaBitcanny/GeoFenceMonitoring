@@ -238,7 +238,7 @@ AppDelegate * appDelegate;
     NSMutableDictionary * statusDic = [[NSMutableDictionary alloc] initWithDictionary:[Utility getStatusDic]];
     
     cell.homeLbl.text = [[self.latLongDic allKeys] objectAtIndex:indexPath.row];
-    cell.latLongLbl.text = [self.latLongDic objectForKey:[[self.latLongDic allKeys] objectAtIndex:indexPath.row]];
+    cell.latLongLbl.text = [[self.latLongDic objectForKey:[[self.latLongDic allKeys] objectAtIndex:indexPath.row]] stringByReplacingOccurrencesOfString:@"," withString:@"\n"];
     cell.statusLbl.text = [statusDic objectForKey:[[self.latLongDic allKeys] objectAtIndex:indexPath.row]];
     
     cell.homeLbl.backgroundColor=[UIColor colorWithRed:(211/255.0) green:(211/255.0) blue:(211/255.0) alpha:1.0];;

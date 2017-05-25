@@ -252,10 +252,12 @@
     CLLocationDistance distanceThreshold = 2.0; // in meters
     if (!currentLocation || [currentLocation distanceFromLocation:newLocation] > distanceThreshold)
     {
-        NSLog(@"Got location");
         currentLocation = newLocation;
+        NSLog(@"Got currentLocation %@",currentLocation);
+        
         [self.locationManager stopUpdatingLocation];
         NSLog(@"stopUpdatingLocation");
+        
         if([isUpdatingFromHome isEqualToString:@"1"]){
             NSLog(@"Got location to isUpdatingFromHome");
             isUpdatingFromHome = @"0";
@@ -343,7 +345,7 @@ BOOL CLLocationCoordinateEqual(CLLocationCoordinate2D coordinate1, CLLocationCoo
     
     NSArray *homeList = [latLongDic allKeys];
     
-    NSLog(@"setUpGeofences homeList %@ self.locationManager.monitoredRegions %@",homeList,self.locationManager.monitoredRegions);
+    NSLog(@"setUpGeofences latLongDic %@ self.locationManager.monitoredRegions %@",latLongDic,self.locationManager.monitoredRegions);
     
     for (int i=0; i<[homeList count]; i++)
     {
@@ -427,7 +429,7 @@ BOOL CLLocationCoordinateEqual(CLLocationCoordinate2D coordinate1, CLLocationCoo
     
     if([CLLocationManager isMonitoringAvailableForClass:[CLRegion class]])
     {
-        NSLog(@"Monitoring Available");
+        NSLog(@"Monitoring Available : region created");
         [self.locationManager startMonitoringForRegion:region];
     }
     else{
@@ -439,7 +441,17 @@ BOOL CLLocationCoordinateEqual(CLLocationCoordinate2D coordinate1, CLLocationCoo
 
 -(void)checkRegionStatus:(CLRegion *)region{
     
+    
+    
     NSLog(@"Checking status for %@ region %@ currentLocation %@ ",region.identifier,region,currentLocation);
+    
+    NSMutableDictionary * latLongDic = [[NSMutableDictionary alloc] initWithDictionary:[Utility getLatLongDic]];
+    NSArray * latlongArr = [[latLongDic objectForKey:region.identifier] componentsSeparatedByString:@","];
+    
+    CLLocation *regionCenter = [[CLLocation alloc] initWithLatitude:[[latlongArr objectAtIndex:0] floatValue]
+                                                  longitude:[[latlongArr objectAtIndex:1] floatValue]];
+    CLLocationDistance distance = [regionCenter distanceFromLocation:currentLocation];
+    NSLog(@"Calculated distance %@ meters", [NSString stringWithFormat:@"%f",distance]);
     
     NSString * statusStr = @"exited";
     if ([region containsCoordinate:CLLocationCoordinate2DMake(currentLocation.coordinate.latitude, currentLocation.coordinate.longitude)]) {
