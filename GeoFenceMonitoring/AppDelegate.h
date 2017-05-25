@@ -29,7 +29,7 @@
 
 - (void)startUpdatingUserLocation;
 
-- (void)stopMonitoringGeoFences;
+- (void)clearGeofences;
 
 @end
 

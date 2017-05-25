@@ -32,10 +32,18 @@
     return [[NSUserDefaults standardUserDefaults] valueForKey:@"LatLongDic"];
 }
 
-+(void)setLatLongDic:(NSMutableDictionary *)hubStatusTimingDic{
-    [[NSUserDefaults standardUserDefaults] setObject:hubStatusTimingDic forKey:@"LatLongDic"];
++(void)setLatLongDic:(NSMutableDictionary *)hubLatLongDic{
+    [[NSUserDefaults standardUserDefaults] setObject:hubLatLongDic forKey:@"LatLongDic"];
     [[NSUserDefaults standardUserDefaults]synchronize];
 }
 
++(NSMutableDictionary *)getStatusDic{
+    return [[NSUserDefaults standardUserDefaults] valueForKey:@"StatusDic"];
+}
+
++(void)setStatusDic:(NSMutableDictionary *)hubStatusDic{
+    [[NSUserDefaults standardUserDefaults] setObject:hubStatusDic forKey:@"StatusDic"];
+    [[NSUserDefaults standardUserDefaults]synchronize];
+}
 
 @end

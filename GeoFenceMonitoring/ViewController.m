@@ -23,9 +23,14 @@ AppDelegate * appDelegate;
     // Do any additional setup after loading the view, typically from a nib.
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(setCurrentLocation) name:@"NotificationSetCurrentLocation" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTable) name:@"NotificationReloadTable" object:nil];
     
+    //------- TextFields----------
     self.hubnameTF.delegate=self;
     self.currLocTF.delegate=self;
+    self.radiusTF.delegate=self;
+    
+    self.radiusTF.text=[Utility getGeoFenceRadius];
     
     //------- picker----------
     self.accuracyArray=[[NSMutableArray alloc] initWithObjects:@"AccuracyBestForNavigation",@"AccuracyBest",@"AccuracyNearestTenMeters",@"AccuracyHundredMeters",@"AccuracyKilometer",@"AccuracyThreeKilometers", nil];
@@ -47,19 +52,19 @@ AppDelegate * appDelegate;
     
 }
 
+-(void)reloadTable{
+    [self.hubTableView reloadData];
+}
+
 #pragma mark - Dismiss Keyboard
 -(void)dismissAllKeyboard {
     [self.currLocTF resignFirstResponder];
     [self.hubnameTF resignFirstResponder];
+    [self.radiusTF resignFirstResponder];
 }
 #pragma mark - TextField Delegates
 - (BOOL)textFieldShouldReturn:(UITextField *)textField{
-    if (textField == self.currLocTF) {
-        [self.hubnameTF becomeFirstResponder];
-    }
-    else{
-        [textField resignFirstResponder];
-    }
+    [textField resignFirstResponder];
     return YES;
 }
 
@@ -72,8 +77,16 @@ AppDelegate * appDelegate;
     // Dispose of any resources that can be recreated.
 }
 
+#pragma mark - OnClick
 
 - (IBAction)CurrLocOnClick:(id)sender {
+    
+    self.locationBtn.enabled=false;
+    [self dismissAllKeyboard];
+    [self performSelector:@selector(fetchCurrentLocation) withObject:nil afterDelay:1.0];
+}
+
+-(void)fetchCurrentLocation{
     NSLog(@"\n startUpdatingUserLocation on CurrLocOnClick");
     appDelegate.isUpdatingFromHome = @"1";
     [appDelegate startUpdatingUserLocation];
@@ -82,16 +95,41 @@ AppDelegate * appDelegate;
 - (IBAction)createHubOnClick:(id)sender {
     
     if(self.currLocTF.text.length!=0 && self.hubnameTF.text.length!=0){
-        [self.latLongDic setObject:self.currLocTF.text forKey:self.hubnameTF.text];
-        [Utility setLatLongDic:self.latLongDic];
-        NSLog(@"\n startUpdatingUserLocation on creating hub");
-        appDelegate.needToSetUpGeofence = @"1";
-        [appDelegate startUpdatingUserLocation];
-        self.currLocTF.text=@"";
-        self.hubnameTF.text=@"";
-        [self showAlertViewWithTitle:@"Hub added" andMessage:@"Monitoring started for added hub"];
-        [self.hubTableView reloadData];
+        
+        self.addFenceBtn.enabled=false;
+        [self dismissAllKeyboard];
+        [self performSelector:@selector(addHub) withObject:nil afterDelay:1.0];
     }
+}
+
+-(void)addHub{
+    [self.latLongDic setObject:self.currLocTF.text forKey:self.hubnameTF.text];
+    [Utility setLatLongDic:self.latLongDic];
+    NSLog(@"\n startUpdatingUserLocation on creating hub");
+    appDelegate.needToSetUpGeofence = @"1";
+    [appDelegate startUpdatingUserLocation];
+    self.currLocTF.text=@"";
+    self.hubnameTF.text=@"";
+    [self showAlertViewWithTitle:@"Hub added" andMessage:@"Monitoring started for added hub"];
+    [self.hubTableView reloadData];
+}
+
+- (IBAction)radiusOnClick:(id)sender {
+    if(self.radiusTF.text.length!=0){
+        
+        self.saveRadiusBtn.enabled=false;
+        [self dismissAllKeyboard];
+        [self performSelector:@selector(saveRadius) withObject:nil afterDelay:1.0];
+    }
+}
+
+-(void)saveRadius{
+    [Utility setGeoFenceRadius:self.radiusTF.text];
+    appDelegate.fenceAccuracy = [[Utility getGeoFenceRadius] floatValue];
+    [appDelegate clearGeofences];
+    NSLog(@"\n startUpdatingUserLocation radius changed");
+    appDelegate.needToSetUpGeofence = @"1";
+    [appDelegate startUpdatingUserLocation];
 }
 
 - (void)showAlertViewWithTitle:(NSString*)title andMessage:(NSString *)message {
@@ -135,7 +173,7 @@ AppDelegate * appDelegate;
     appDelegate.fenceAccuracy = (selectedAccuracyIndex + 1) * 1.0;
     [Utility setGeoFenceAccuracy:[NSString stringWithFormat:@"%f",appDelegate.fenceAccuracy]];
     
-    [appDelegate stopMonitoringGeoFences];
+    [appDelegate clearGeofences];
     NSLog(@"\n startUpdatingUserLocation accuracy changed");
     appDelegate.needToSetUpGeofence = @"1";
     [appDelegate startUpdatingUserLocation];
@@ -165,17 +203,11 @@ AppDelegate * appDelegate;
     UILabel *SlNoLbl =  [[UILabel alloc] init];
     
     NSMutableArray * headerArr;
-    headerArr = [[NSMutableArray alloc] initWithObjects:@"Home",@"Latitude-Longitude", nil];
+    headerArr = [[NSMutableArray alloc] initWithObjects:@"Home",@"LatLong",@"Status", nil];
     
     float startX=0;
     float widthVal=tableView.frame.size.width/[headerArr count];
     for (int i=0; i<[headerArr count]; i++) {
-        if(i==0){
-            widthVal=100;
-        }
-        else{
-            widthVal=tableView.frame.size.width-100;
-        }
         SlNoLbl =  [[UILabel alloc] init];
         SlNoLbl.frame=CGRectMake(startX, 0, widthVal, height);
         SlNoLbl.text = [headerArr objectAtIndex:i];
@@ -203,9 +235,11 @@ AppDelegate * appDelegate;
     
     HomeTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:simpleTableIdentifier];
     
+    NSMutableDictionary * statusDic = [[NSMutableDictionary alloc] initWithDictionary:[Utility getStatusDic]];
     
     cell.homeLbl.text = [[self.latLongDic allKeys] objectAtIndex:indexPath.row];
     cell.latLongLbl.text = [self.latLongDic objectForKey:[[self.latLongDic allKeys] objectAtIndex:indexPath.row]];
+    cell.statusLbl.text = [statusDic objectForKey:[[self.latLongDic allKeys] objectAtIndex:indexPath.row]];
     
     cell.homeLbl.backgroundColor=[UIColor colorWithRed:(211/255.0) green:(211/255.0) blue:(211/255.0) alpha:1.0];;
     cell.homeLbl.layer.borderColor=[UIColor grayColor].CGColor;
@@ -214,6 +248,10 @@ AppDelegate * appDelegate;
     cell.latLongLbl.backgroundColor=[UIColor colorWithRed:(211/255.0) green:(211/255.0) blue:(211/255.0) alpha:1.0];
     cell.latLongLbl.layer.borderColor=[UIColor grayColor].CGColor;
     cell.latLongLbl.layer.borderWidth=.5;
+    
+    cell.statusLbl.backgroundColor=[UIColor colorWithRed:(211/255.0) green:(211/255.0) blue:(211/255.0) alpha:1.0];
+    cell.statusLbl.layer.borderColor=[UIColor grayColor].CGColor;
+    cell.statusLbl.layer.borderWidth=.5;
 
     return cell;
     
@@ -239,7 +277,7 @@ AppDelegate * appDelegate;
 #pragma mark- alertview delegate
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
-    NSLog(@"buttonIndex %ld",buttonIndex);
+    NSLog(@"buttonIndex %d",buttonIndex);
     if (buttonIndex==1) {//delete
         [self.latLongDic removeObjectForKey:[[self.latLongDic allKeys] objectAtIndex:selectedIndex]];
         [Utility setLatLongDic:self.latLongDic];

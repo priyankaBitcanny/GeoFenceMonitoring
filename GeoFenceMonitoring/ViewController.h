@@ -21,6 +21,14 @@
 
 @property (weak, nonatomic) IBOutlet UITextField *hubnameTF;
 
+@property (weak, nonatomic) IBOutlet UITextField *radiusTF;
+
+@property (weak, nonatomic) IBOutlet UIButton *locationBtn;
+
+@property (weak, nonatomic) IBOutlet UIButton *addFenceBtn;
+
+@property (weak, nonatomic) IBOutlet UIButton *saveRadiusBtn;
+
 @property (weak, nonatomic) IBOutlet UITableView *hubTableView;
 
 @property (weak, nonatomic) IBOutlet UIPickerView *picVw;
@@ -29,6 +37,8 @@
 
 - (IBAction)createHubOnClick:(id)sender;
 
+- (IBAction)radiusOnClick:(id)sender;
+
 @end
 
 @interface HomeTableViewCell : UITableViewCell
@@ -36,6 +46,8 @@
 @property (weak, nonatomic) IBOutlet UILabel *homeLbl;
 
 @property (weak, nonatomic) IBOutlet UILabel *latLongLbl;
+
+@property (weak, nonatomic) IBOutlet UILabel *statusLbl;
 
 
 @end

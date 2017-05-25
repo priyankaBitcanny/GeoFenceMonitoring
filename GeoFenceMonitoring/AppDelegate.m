@@ -20,6 +20,16 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     
+    if(![Utility getGeoFenceRadius]){
+        [Utility setGeoFenceRadius:@"130"];
+    }
+    if(![Utility getGeoFenceAccuracy]){
+        [Utility setGeoFenceAccuracy:@"4.0"];
+    }
+    self.fenceRadius = [[Utility getGeoFenceRadius] floatValue];
+    self.fenceAccuracy = [[Utility getGeoFenceAccuracy] floatValue];
+    
+    
     NSDictionary* locationInfo = [launchOptions objectForKey:UIApplicationLaunchOptionsLocationKey];
     if (locationInfo != nil){
         NSLog(@"App luanched for location info %@",locationInfo);
@@ -31,19 +41,10 @@
             UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeBadge | UIUserNotificationTypeAlert | UIUserNotificationTypeSound categories:nil];
             [application registerUserNotificationSettings:settings];
         }
-        
-        if(![Utility getGeoFenceRadius]){
-            [Utility setGeoFenceRadius:@"130"];
-        }
-        if(![Utility getGeoFenceAccuracy]){
-            [Utility setGeoFenceAccuracy:@"4.0"];
-        }
-        self.fenceRadius = [[Utility getGeoFenceRadius] floatValue];
-        self.fenceAccuracy = [[Utility getGeoFenceAccuracy] floatValue];
-        isUpdatingFromHome = @"0";
-        needToSetUpGeofence = @"0";
     }
     
+    isUpdatingFromHome = @"0";
+    needToSetUpGeofence = @"0";
     
     
     
@@ -140,8 +141,8 @@
     }
 }
 
-- (void)stopMonitoringGeoFences{
-    NSLog(@"region count %ld",[self.locationManager.monitoredRegions count]);
+- (void)clearGeofences{
+    NSLog(@"region count %ld",(unsigned long)[self.locationManager.monitoredRegions count]);
     if([self isLocationServiceEnabled]){
         if (!self.locationManager) {
             [self initialiseLocationManager];
@@ -268,6 +269,13 @@
     
     NSString *hubOccupantSettings = region.identifier;
     
+    NSMutableDictionary * statusDic = [[NSMutableDictionary alloc] initWithDictionary:[Utility getStatusDic]];
+    [statusDic setObject:notifType forKey:region.identifier];
+    [Utility setStatusDic:statusDic];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"NotificationReloadTable" object:nil];
+    });
+    
     UIApplicationState state = [[UIApplication sharedApplication] applicationState];
     if (state == UIApplicationStateActive) {
         NSLog(@"[Debug]:Geofence: %@ region:%@",notifType,region.identifier);
@@ -377,7 +385,8 @@ BOOL CLLocationCoordinateEqual(CLLocationCoordinate2D coordinate1, CLLocationCoo
 
 -(void)createNewRegionToTrack:(NSString *)home{
     
-    NSLog(@"createNewRegionToTrack");
+    self.fenceRadius = [[Utility getGeoFenceRadius] floatValue];
+    NSLog(@"createNewRegionToTrack self.fenceRadius %f",self.fenceRadius);
     
     NSMutableDictionary * latLongDic = [[NSMutableDictionary alloc] initWithDictionary:[Utility getLatLongDic]];
     NSArray * latlongArr = [[latLongDic objectForKey:home] componentsSeparatedByString:@","];
@@ -402,14 +411,20 @@ BOOL CLLocationCoordinateEqual(CLLocationCoordinate2D coordinate1, CLLocationCoo
 
 -(void)checkRegionStatus:(CLRegion *)region{
     
-    NSLog(@"Checking status for %@",region.identifier);
+    NSLog(@"Checking status for %@ region %@ currentLocation %@ ",region.identifier,region,currentLocation);
     
     NSString * statusStr = @"exited";
     if ([region containsCoordinate:CLLocationCoordinate2DMake(currentLocation.coordinate.latitude, currentLocation.coordinate.longitude)]) {
         statusStr = @"entered";
     }
     
-    NSLog(@"Checked status %@ for %@",statusStr,region.identifier);
+    NSMutableDictionary * statusDic = [[NSMutableDictionary alloc] initWithDictionary:[Utility getStatusDic]];
+    [statusDic setObject:statusStr forKey:region.identifier];
+    [Utility setStatusDic:statusDic];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"NotificationReloadTable" object:nil];
+    });
+    NSLog(@"Status Checked : %@ for %@",statusStr,region.identifier);
     
     //App is in foreground. Act on it.
     UIApplicationState state = [[UIApplication sharedApplication] applicationState];
@@ -426,19 +441,6 @@ BOOL CLLocationCoordinateEqual(CLLocationCoordinate2D coordinate1, CLLocationCoo
         [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
     }
 }
-
-- (void)clearGeofences
-{
-    NSLog(@"clearGeofences");
-    if (!self.locationManager) {
-        [self initialiseLocationManager];
-    }
-    
-    for (CLRegion* region in self.locationManager.monitoredRegions){
-        [self.locationManager stopMonitoringForRegion:region];
-    }
-}
-
 
 - (void)showAlertViewWithTitle:(NSString*)title andMessage:(NSString *)message {
     

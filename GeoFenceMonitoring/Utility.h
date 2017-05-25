@@ -20,7 +20,10 @@
 
 +(NSMutableDictionary *)getLatLongDic;
 
-+(void)setLatLongDic:(NSMutableDictionary *)hubStatusTimingDic;
++(void)setLatLongDic:(NSMutableDictionary *)hubLatLongDic;
 
++(NSMutableDictionary *)getStatusDic;
+
++(void)setStatusDic:(NSMutableDictionary *)hubStatusDic;
 
 @end
