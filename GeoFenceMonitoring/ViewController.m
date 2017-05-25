@@ -38,6 +38,7 @@ AppDelegate * appDelegate;
     
     //------tableview--------
     self.latLongDic = [[NSMutableDictionary alloc] initWithDictionary:[Utility getLatLongDic]];
+    NSLog(@"\n startUpdatingUserLocation from didload");
     [appDelegate startUpdatingUserLocation];
     self.hubTableView.delegate=self;
     self.hubTableView.dataSource=self;
@@ -62,7 +63,7 @@ AppDelegate * appDelegate;
 }
 
 -(void)setCurrentLocation{
-    self.currLocTF.text = [NSString stringWithFormat:@"%f,%f",appDelegate.currentLocation.coordinate.latitude,appDelegate.currentLocation.coordinate.latitude];
+    self.currLocTF.text = [NSString stringWithFormat:@"%f,%f",appDelegate.currentLocation.coordinate.latitude,appDelegate.currentLocation.coordinate.longitude];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -73,6 +74,7 @@ AppDelegate * appDelegate;
 
 - (IBAction)CurrLocOnClick:(id)sender {
     appDelegate.isUpdatingFromHome = @"1";
+    NSLog(@"\n startUpdatingUserLocation on CurrLocOnClick");
     [appDelegate startUpdatingUserLocation];
 }
 
@@ -81,6 +83,7 @@ AppDelegate * appDelegate;
     if(self.currLocTF.text.length!=0 && self.hubnameTF.text.length!=0){
         [self.latLongDic setObject:self.currLocTF.text forKey:self.hubnameTF.text];
         [Utility setLatLongDic:self.latLongDic];
+        NSLog(@"\n startUpdatingUserLocation on creating hub");
         [appDelegate startUpdatingUserLocation];
         self.currLocTF.text=@"";
         self.hubnameTF.text=@"";
@@ -131,6 +134,7 @@ AppDelegate * appDelegate;
     [Utility setGeoFenceAccuracy:[NSString stringWithFormat:@"%f",appDelegate.fenceAccuracy]];
     
     [appDelegate stopMonitoringGeoFences];
+    NSLog(@"\n startUpdatingUserLocation accuracy changed");
     [appDelegate startUpdatingUserLocation];
 }
 

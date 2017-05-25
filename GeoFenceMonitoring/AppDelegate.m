@@ -123,7 +123,7 @@
     currentLocation = nil;
     NSLog(@"startUpdatingUserLocation");
     if([self isLocationServiceEnabled]){
-        NSLog(@"LocationServiceEnabled");
+        NSLog(@"LocationServiceEnabled startUpdating");
         if (!self.locationManager) {
             [self initialiseLocationManager];
         }
@@ -212,7 +212,7 @@
     {
         [self.locationManager setDesiredAccuracy:kCLLocationAccuracyBest];
     }
-    NSLog(@"Location manager - distanceFilter : %f accuracy : %f self.fenceAccuracy %f",self.locationManager.distanceFilter,self.locationManager.desiredAccuracy,self.fenceAccuracy);
+    NSLog(@"Location manager - distanceFilter : %f self.fenceAccuracy %f accuracySetTo : %f meters",self.locationManager.distanceFilter,self.fenceAccuracy,self.locationManager.desiredAccuracy);
 }
 
 #pragma mark - CLLocationManagerDelegate
@@ -226,12 +226,14 @@
         NSLog(@"Got location");
         currentLocation = newLocation;
         [self.locationManager stopUpdatingLocation];
-        
+        NSLog(@"stopUpdatingLocation");
         if([isUpdatingFromHome isEqualToString:@"1"]){
+            NSLog(@"Got location to isUpdatingFromHome");
             isUpdatingFromHome = @"0";
             [[NSNotificationCenter defaultCenter] postNotificationName:@"NotificationSetCurrentLocation" object:nil];
         }
         else{
+            NSLog(@"Got location to setUpGeofences");
             [self setUpGeofences];
         }
         
@@ -292,34 +294,41 @@
     
     [self setLocationManagerAccuracy];
     
-    NSLog(@"setUpGeofences executed");
-    
     NSMutableDictionary * latLongDic = [[NSMutableDictionary alloc] initWithDictionary:[Utility getLatLongDic]];
     
     NSArray *homeList = [latLongDic allKeys];
+    
+    NSLog(@"setUpGeofences homeList %@ self.locationManager.monitoredRegions %@",homeList,self.locationManager.monitoredRegions);
     
     for (int i=0; i<[homeList count]; i++)
     {
         NSString * home = [homeList objectAtIndex:i];
         BOOL shallFormNewRegion = YES;
         
+        NSLog(@"index %d home %@",i,home);
+        
         for (CLRegion* region in self.locationManager.monitoredRegions)
         {
+            NSLog(@"region.identifier %@",region.identifier);
+            
             if ([region.identifier isEqualToString:home]) {
                 
-                NSArray * latlongArr = [[latLongDic objectForKey:[[latLongDic allKeys] objectAtIndex:i]] componentsSeparatedByString:@","];
+                NSLog(@"identifier matched %@",home);
+                
+                NSArray * latlongArr = [[latLongDic objectForKey:home] componentsSeparatedByString:@","];
                 
                 CLLocationCoordinate2D center1 = CLLocationCoordinate2DMake([[latlongArr objectAtIndex:0] floatValue], [[latlongArr objectAtIndex:1] floatValue]);
                 
                 CLLocationCoordinate2D center2 = CLLocationCoordinate2DMake(region.center.latitude, region.center.longitude);
                 
                 if (!CLLocationCoordinateEqual(center1, center2)) {
+                    NSLog(@"center mismatched home %@",home);
                     [self.locationManager stopMonitoringForRegion:region];
                     shallFormNewRegion = YES;
                 }
                 else{
+                    NSLog(@"center matched home %@",home);
                     shallFormNewRegion = NO;
-                    //region exists.... check position and update
                     [self checkRegionStatus:region];
                 }
                 
@@ -365,10 +374,13 @@ BOOL CLLocationCoordinateEqual(CLLocationCoordinate2D coordinate1, CLLocationCoo
 
 
 -(void)createNewRegionToTrack:(NSString *)home{
+    
     NSLog(@"createNewRegionToTrack");
+    
     NSMutableDictionary * latLongDic = [[NSMutableDictionary alloc] initWithDictionary:[Utility getLatLongDic]];
     NSArray * latlongArr = [[latLongDic objectForKey:home] componentsSeparatedByString:@","];
     
+    NSLog(@"createNewRegionToTrack home %@ latlongArr %@",home,latlongArr);
     
     CLLocationCoordinate2D center = CLLocationCoordinate2DMake([[latlongArr objectAtIndex:0] floatValue], [[latlongArr objectAtIndex:1] floatValue]);
     
@@ -387,10 +399,16 @@ BOOL CLLocationCoordinateEqual(CLLocationCoordinate2D coordinate1, CLLocationCoo
 }
 
 -(void)checkRegionStatus:(CLRegion *)region{
+    
+    NSLog(@"Checking status for %@",region.identifier);
+    
     NSString * statusStr = @"exited";
     if ([region containsCoordinate:CLLocationCoordinate2DMake(currentLocation.coordinate.latitude, currentLocation.coordinate.longitude)]) {
         statusStr = @"entered";
     }
+    
+    NSLog(@"Checked status %@ for %@",statusStr,region.identifier);
+    
     //App is in foreground. Act on it.
     UIApplicationState state = [[UIApplication sharedApplication] applicationState];
     
