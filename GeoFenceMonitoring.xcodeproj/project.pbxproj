@@ -16,6 +16,8 @@
 		6314C0291ED5ABF1000AFC0B /* Utility.m in Sources */ = {isa = PBXBuildFile; fileRef = 6314C0281ED5ABF1000AFC0B /* Utility.m */; };
 		6314C02B1ED5B456000AFC0B /* WorkToHome.gpx in Resources */ = {isa = PBXBuildFile; fileRef = 6314C02A1ED5B456000AFC0B /* WorkToHome.gpx */; };
 		6314C02E1ED5B47D000AFC0B /* UIView+Toast.m in Sources */ = {isa = PBXBuildFile; fileRef = 6314C02D1ED5B47D000AFC0B /* UIView+Toast.m */; };
+		638920611EDD384700602EDE /* LogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 638920601EDD384700602EDE /* LogViewController.m */; };
+		638920641EDD3D6600602EDE /* ExtendNSLogFunctionality.m in Sources */ = {isa = PBXBuildFile; fileRef = 638920631EDD3D6600602EDE /* ExtendNSLogFunctionality.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +36,10 @@
 		6314C02A1ED5B456000AFC0B /* WorkToHome.gpx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = WorkToHome.gpx; sourceTree = "<group>"; };
 		6314C02C1ED5B47D000AFC0B /* UIView+Toast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+Toast.h"; sourceTree = "<group>"; };
 		6314C02D1ED5B47D000AFC0B /* UIView+Toast.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+Toast.m"; sourceTree = "<group>"; };
+		6389205F1EDD384700602EDE /* LogViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogViewController.h; sourceTree = "<group>"; };
+		638920601EDD384700602EDE /* LogViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LogViewController.m; sourceTree = "<group>"; };
+		638920621EDD3D6600602EDE /* ExtendNSLogFunctionality.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtendNSLogFunctionality.h; sourceTree = "<group>"; };
+		638920631EDD3D6600602EDE /* ExtendNSLogFunctionality.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExtendNSLogFunctionality.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,6 +80,10 @@
 				6314C02D1ED5B47D000AFC0B /* UIView+Toast.m */,
 				6314C0161ED56807000AFC0B /* ViewController.h */,
 				6314C0171ED56807000AFC0B /* ViewController.m */,
+				6389205F1EDD384700602EDE /* LogViewController.h */,
+				638920601EDD384700602EDE /* LogViewController.m */,
+				638920621EDD3D6600602EDE /* ExtendNSLogFunctionality.h */,
+				638920631EDD3D6600602EDE /* ExtendNSLogFunctionality.m */,
 				6314C0191ED56807000AFC0B /* Main.storyboard */,
 				6314C02A1ED5B456000AFC0B /* WorkToHome.gpx */,
 				6314C01C1ED56807000AFC0B /* Assets.xcassets */,
@@ -175,6 +185,8 @@
 				6314C0151ED56807000AFC0B /* AppDelegate.m in Sources */,
 				6314C02E1ED5B47D000AFC0B /* UIView+Toast.m in Sources */,
 				6314C0121ED56807000AFC0B /* main.m in Sources */,
+				638920641EDD3D6600602EDE /* ExtendNSLogFunctionality.m in Sources */,
+				638920611EDD384700602EDE /* LogViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -300,7 +312,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.bitcanny.GeoFenceMonitoring;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "4efde04c-92b6-4129-a4da-dbdfbc658924";
+				PROVISIONING_PROFILE = "bd874875-4560-44c4-aa72-b62eec43bc59";
 				PROVISIONING_PROFILE_SPECIFIER = GeoFenceMonitoringDev;
 			};
 			name = Debug;

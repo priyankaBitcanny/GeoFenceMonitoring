@@ -46,4 +46,13 @@
     [[NSUserDefaults standardUserDefaults]synchronize];
 }
 
++(NSString *)getLogStr{
+    return [[NSUserDefaults standardUserDefaults] valueForKey:@"logStr"];
+}
+
++(void)setLogStr:(NSString *)logStr{
+    [[NSUserDefaults standardUserDefaults] setObject:logStr forKey:@"logStr"];
+    [[NSUserDefaults standardUserDefaults]synchronize];
+}
+
 @end

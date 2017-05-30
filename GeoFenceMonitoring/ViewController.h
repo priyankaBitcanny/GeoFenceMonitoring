@@ -41,6 +41,8 @@
 
 - (IBAction)radiusOnClick:(id)sender;
 
+- (IBAction)nextOnClick:(id)sender;
+
 @end
 
 @interface HomeTableViewCell : UITableViewCell

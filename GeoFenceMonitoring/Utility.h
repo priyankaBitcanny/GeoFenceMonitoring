@@ -26,4 +26,8 @@
 
 +(void)setStatusDic:(NSMutableDictionary *)hubStatusDic;
 
++(NSString *)getLogStr;
+
++(void)setLogStr:(NSString *)logStr;
+
 @end

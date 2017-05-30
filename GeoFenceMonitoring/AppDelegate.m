@@ -8,6 +8,7 @@
 
 #import "AppDelegate.h"
 #import "Utility.h"
+#import "ExtendNSLogFunctionality.h"
 
 @interface AppDelegate ()
 
@@ -21,10 +22,10 @@
     // Override point for customization after application launch.
     
     if(![Utility getGeoFenceRadius]){
-        [Utility setGeoFenceRadius:@"130"];
+        [Utility setGeoFenceRadius:@"150"];
     }
     if(![Utility getGeoFenceAccuracy]){
-        [Utility setGeoFenceAccuracy:@"4.0"];
+        [Utility setGeoFenceAccuracy:@"1.0"];
     }
     self.fenceRadius = [[Utility getGeoFenceRadius] floatValue];
     self.fenceAccuracy = [[Utility getGeoFenceAccuracy] floatValue];
@@ -284,12 +285,12 @@
 }
 
 - (void)locationManager:(CLLocationManager *)manager didEnterRegion:(CLRegion *)region{
-    NSLog(@"Location didEnterRegion - distanceFilter : %f accuracy : %f",manager.distanceFilter,manager.desiredAccuracy);
+    NSLog(@"Location EnterRegion - accuracy : %f",manager.desiredAccuracy);
     [self showNotificationForRegion:region andType:@"entered" andRadius:YES];
 }
 
 - (void)locationManager:(CLLocationManager *)manager didExitRegion:(CLRegion *)region{
-    NSLog(@"Location didExitRegion - distanceFilter : %f accuracy : %f",manager.distanceFilter,manager.desiredAccuracy);
+    NSLog(@"Location ExitRegion - accuracy : %f",manager.desiredAccuracy);
     [self showNotificationForRegion:region andType:@"exited" andRadius:NO];
 }
 
@@ -352,15 +353,15 @@ BOOL CLLocationCoordinateEqual(CLLocationCoordinate2D coordinate1, CLLocationCoo
         NSString * home = [homeList objectAtIndex:i];
         BOOL shallFormNewRegion = YES;
         
-        NSLog(@"index %d home %@",i,home);
+        NSLog(@"index %d hub %@",i,home);
         
         for (CLRegion* region in self.locationManager.monitoredRegions)
         {
-            NSLog(@"region.identifier %@",region.identifier);
+            NSLog(@"region.identifier = %@",region.identifier);
             
             if ([region.identifier isEqualToString:home]) {
                 
-                NSLog(@"identifier matched %@",home);
+                NSLog(@"identifier matched with %@",home);
                 
                 NSArray * latlongArr = [[latLongDic objectForKey:home] componentsSeparatedByString:@","];
                 
@@ -369,12 +370,12 @@ BOOL CLLocationCoordinateEqual(CLLocationCoordinate2D coordinate1, CLLocationCoo
                 CLLocationCoordinate2D center2 = CLLocationCoordinate2DMake(region.center.latitude, region.center.longitude);
                 
                 if (!CLLocationCoordinateEqual(center1, center2)) {
-                    NSLog(@"center mismatched home %@",home);
+                    NSLog(@"center mismatched for %@",home);
                     [self.locationManager stopMonitoringForRegion:region];
                     shallFormNewRegion = YES;
                 }
                 else{
-                    NSLog(@"center matched home %@",home);
+                    NSLog(@"center matched for %@",home);
                     shallFormNewRegion = NO;
                     [self checkRegionStatus:region];
                 }
@@ -440,8 +441,6 @@ BOOL CLLocationCoordinateEqual(CLLocationCoordinate2D coordinate1, CLLocationCoo
 }
 
 -(void)checkRegionStatus:(CLRegion *)region{
-    
-    
     
     NSLog(@"Checking status for %@ region %@ currentLocation %@ ",region.identifier,region,currentLocation);
     

@@ -9,6 +9,7 @@
 #import "ViewController.h"
 #import "AppDelegate.h"
 #import "Utility.h"
+#import "ExtendNSLogFunctionality.h"
 
 @interface ViewController (){
 AppDelegate * appDelegate;
@@ -46,7 +47,7 @@ AppDelegate * appDelegate;
     
     //------tableview--------
     self.latLongDic = [[NSMutableDictionary alloc] initWithDictionary:[Utility getLatLongDic]];
-    NSLog(@"\n startUpdatingUserLocation from didload");
+    NSLog(@"startUpdatingUserLocation from didload");
     appDelegate.needToSetUpGeofence = @"1";
     [appDelegate startUpdatingUserLocation];
     self.hubTableView.delegate=self;
@@ -114,7 +115,7 @@ AppDelegate * appDelegate;
     if(self.currLocTF.text.length!=0 && self.hubnameTF.text.length!=0 && self.radiusTF.text.length!=0){
         [self.latLongDic setObject:self.currLocTF.text forKey:self.hubnameTF.text];
         [Utility setLatLongDic:self.latLongDic];
-        NSLog(@"\n startUpdatingUserLocation on creating hub");
+        NSLog(@"startUpdatingUserLocation on creating hub");
         appDelegate.needToSetUpGeofence = @"1";
         [appDelegate startUpdatingUserLocation];
         [self showAlertViewWithTitle:@"Hub added" andMessage:[NSString stringWithFormat:@"Monitoring started for %@",self.hubnameTF.text]];
@@ -137,12 +138,16 @@ AppDelegate * appDelegate;
     }
 }
 
+- (IBAction)nextOnClick:(id)sender {
+    [self performSegueWithIdentifier:@"goToLog" sender:self];
+}
+
 -(void)saveRadius{
     self.saveRadiusBtn.enabled=true;
     [Utility setGeoFenceRadius:self.radiusTF.text];
     appDelegate.fenceAccuracy = [[Utility getGeoFenceRadius] floatValue];
     [appDelegate clearGeofences];
-    NSLog(@"\n startUpdatingUserLocation radius changed");
+    NSLog(@"startUpdatingUserLocation radius changed");
     appDelegate.needToSetUpGeofence = @"1";
     [appDelegate startUpdatingUserLocation];
 }
@@ -177,7 +182,7 @@ AppDelegate * appDelegate;
     [Utility setGeoFenceAccuracy:[NSString stringWithFormat:@"%f",appDelegate.fenceAccuracy]];
     
     [appDelegate clearGeofences];
-    NSLog(@"\n startUpdatingUserLocation accuracy changed");
+    NSLog(@"startUpdatingUserLocation accuracy changed");
     appDelegate.needToSetUpGeofence = @"1";
     [appDelegate startUpdatingUserLocation];
 }
