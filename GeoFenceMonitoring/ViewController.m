@@ -47,9 +47,18 @@ AppDelegate * appDelegate;
     
     //------tableview--------
     self.latLongDic = [[NSMutableDictionary alloc] initWithDictionary:[Utility getLatLongDic]];
-    NSLog(@"startUpdatingUserLocation from didload");
-    appDelegate.needToSetUpGeofence = @"1";
-    [appDelegate startUpdatingUserLocation];
+    
+    UIApplicationState state = [[UIApplication sharedApplication] applicationState];
+    if (state == UIApplicationStateActive) {
+        NSLog(@"startUpdatingUserLocation from didload in Foreground app Active");
+        appDelegate.needToSetUpGeofence = @"1";
+        [appDelegate startUpdatingUserLocation];
+    }
+    else{
+        NSLog(@"viewController didload in Background");
+    }
+    
+    
     self.hubTableView.delegate=self;
     self.hubTableView.dataSource=self;
     [self.hubTableView reloadData];
