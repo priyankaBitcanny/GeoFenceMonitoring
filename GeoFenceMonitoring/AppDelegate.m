@@ -239,6 +239,7 @@
         case kCLAuthorizationStatusAuthorizedWhenInUse:
             break;
         case kCLAuthorizationStatusAuthorizedAlways: {
+            NSLog(@"kCLAuthorizationStatusAuthorizedAlways startUpdatingLocation");
             [self.locationManager startUpdatingLocation];
         }
             break;
