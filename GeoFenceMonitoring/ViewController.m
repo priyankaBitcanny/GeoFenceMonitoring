@@ -23,6 +23,8 @@ AppDelegate * appDelegate;
     appDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
     // Do any additional setup after loading the view, typically from a nib.
     
+    NSLog(@"viewDidLoad");
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(setCurrentLocation) name:@"NotificationSetCurrentLocation" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTable) name:@"NotificationReloadTable" object:nil];
     
@@ -63,6 +65,11 @@ AppDelegate * appDelegate;
     self.hubTableView.dataSource=self;
     [self.hubTableView reloadData];
     
+}
+
+-(void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    self.navigationController.navigationBarHidden=YES;
 }
 
 

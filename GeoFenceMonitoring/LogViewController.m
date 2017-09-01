@@ -18,6 +18,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+    self.navigationController.navigationBarHidden=NO;
+    
     self.logTextView.text = [Utility getLogStr];
 }
 

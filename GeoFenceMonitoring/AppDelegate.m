@@ -21,6 +21,14 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     
+    //---------- LOGS SAVED TO FILE ----------------
+    /*NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *fileName =[NSString stringWithFormat:@"%@.log",[NSDate date]];
+    NSString *logFilePath = [documentsDirectory stringByAppendingPathComponent:fileName];
+    freopen([logFilePath cStringUsingEncoding:NSASCIIStringEncoding],"a+",stderr);*/
+    //----------------------------------------------
+    
     if(![Utility getGeoFenceRadius]){
         [Utility setGeoFenceRadius:@"150"];
     }
@@ -427,9 +435,12 @@ BOOL CLLocationCoordinateEqual(CLLocationCoordinate2D coordinate1, CLLocationCoo
     
     CLLocationCoordinate2D center = CLLocationCoordinate2DMake([[latlongArr objectAtIndex:0] floatValue], [[latlongArr objectAtIndex:1] floatValue]);
     
-    CLRegion *region = [[CLCircularRegion alloc] initWithCenter:center radius:self.fenceRadius identifier:home];
+    CLCircularRegion *region = [[CLCircularRegion alloc] initWithCenter:center radius:self.fenceRadius identifier:home];
     
-    if([CLLocationManager isMonitoringAvailableForClass:[CLRegion class]])
+    region.notifyOnEntry = YES;
+    region.notifyOnExit = YES;
+    
+    if([CLLocationManager isMonitoringAvailableForClass:[CLCircularRegion     class]])
     {
         NSLog(@"Monitoring Available : region created");
         [self.locationManager startMonitoringForRegion:region];
