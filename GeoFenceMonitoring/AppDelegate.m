@@ -312,7 +312,7 @@
     NSString *hubOccupantSettings = region.identifier;
     
     NSMutableDictionary * statusDic = [[NSMutableDictionary alloc] initWithDictionary:[Utility getStatusDic]];
-    [statusDic setObject:notifType forKey:region.identifier];
+    [statusDic setObject:[notifType capitalizedString] forKey:region.identifier];
     [Utility setStatusDic:statusDic];
     dispatch_async(dispatch_get_main_queue(), ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:@"NotificationReloadTable" object:nil];
@@ -443,7 +443,7 @@ BOOL CLLocationCoordinateEqual(CLLocationCoordinate2D coordinate1, CLLocationCoo
     region.notifyOnEntry = YES;
     region.notifyOnExit = YES;
     
-    if([CLLocationManager isMonitoringAvailableForClass:[CLCircularRegion     class]])
+    if([CLLocationManager isMonitoringAvailableForClass:[CLCircularRegion class]])
     {
         NSLog(@"Monitoring Available : region created");
         [self.locationManager startMonitoringForRegion:region];
@@ -473,7 +473,7 @@ BOOL CLLocationCoordinateEqual(CLLocationCoordinate2D coordinate1, CLLocationCoo
     }
     
     NSMutableDictionary * statusDic = [[NSMutableDictionary alloc] initWithDictionary:[Utility getStatusDic]];
-    [statusDic setObject:statusStr forKey:region.identifier];
+    [statusDic setObject:[statusStr capitalizedString] forKey:region.identifier];
     [Utility setStatusDic:statusDic];
     dispatch_async(dispatch_get_main_queue(), ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:@"NotificationReloadTable" object:nil];
