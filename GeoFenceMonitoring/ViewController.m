@@ -234,7 +234,7 @@ AppDelegate * appDelegate;
     for (int i=0; i<[headerArr count]; i++) {
         SlNoLbl =  [[UILabel alloc] init];
         SlNoLbl.frame=CGRectMake(startX, 0, widthVal, height);
-        SlNoLbl.text = [headerArr objectAtIndex:i];
+        SlNoLbl.text = [NSString stringWithFormat:@" %@",[headerArr objectAtIndex:i]];
         SlNoLbl.numberOfLines=2;
         SlNoLbl.backgroundColor=[UIColor clearColor];
         SlNoLbl.font=[UIFont boldSystemFontOfSize:14.0];
@@ -261,9 +261,9 @@ AppDelegate * appDelegate;
     
     NSMutableDictionary * statusDic = [[NSMutableDictionary alloc] initWithDictionary:[Utility getStatusDic]];
     
-    cell.homeLbl.text = [[self.latLongDic allKeys] objectAtIndex:indexPath.row];
-    cell.latLongLbl.text = [[self.latLongDic objectForKey:[[self.latLongDic allKeys] objectAtIndex:indexPath.row]] stringByReplacingOccurrencesOfString:@"," withString:@"\n"];
-    cell.statusLbl.text = [statusDic objectForKey:[[self.latLongDic allKeys] objectAtIndex:indexPath.row]];
+    cell.homeLbl.text = [NSString stringWithFormat:@" %@",[[self.latLongDic allKeys] objectAtIndex:indexPath.row]];
+    cell.latLongLbl.text = [NSString stringWithFormat:@" %@",[[self.latLongDic objectForKey:[[self.latLongDic allKeys] objectAtIndex:indexPath.row]] stringByReplacingOccurrencesOfString:@"," withString:@"\n "]];
+    cell.statusLbl.text = [NSString stringWithFormat:@" %@",[statusDic objectForKey:[[self.latLongDic allKeys] objectAtIndex:indexPath.row]]];
     
     cell.homeLbl.backgroundColor=[UIColor colorWithRed:(211/255.0) green:(211/255.0) blue:(211/255.0) alpha:1.0];;
     cell.homeLbl.layer.borderColor=[UIColor grayColor].CGColor;

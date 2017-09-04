@@ -35,7 +35,6 @@
         
         latLongArr = [[NSMutableArray alloc] initWithArray:[[self.latLongDic objectForKey:[[self.latLongDic allKeys] objectAtIndex:i]] componentsSeparatedByString:@","]];
         
-        MKUserLocation * userLocation;
         CLLocationDistance fenceDistance = [[Utility getGeoFenceRadius] floatValue];
         CLLocationCoordinate2D circleMiddlePoint = CLLocationCoordinate2DMake([[latLongArr objectAtIndex:0] floatValue], [[latLongArr objectAtIndex:1] floatValue]);
         MKCircle *circle = [MKCircle circleWithCenterCoordinate:circleMiddlePoint radius:fenceDistance];
@@ -44,9 +43,9 @@
         
         MKPointAnnotation *point;
         point = [[MKPointAnnotation alloc] init];
-        point.coordinate = userLocation.coordinate;
-        point.title = @"Where am I?";
-        point.subtitle = @"I'm here!!!";
+        point.coordinate = circleMiddlePoint;
+        point.title = [[self.latLongDic allKeys] objectAtIndex:i];
+        point.subtitle = [self.latLongDic objectForKey:[[self.latLongDic allKeys] objectAtIndex:i]];
         [self.mapView addAnnotation:point];
     }
     
@@ -59,18 +58,6 @@
     [self.mapView setRegion:[self.mapView regionThatFits:region] animated:YES];
     // Add an annotation
     
-    /*CLLocationDistance fenceDistance = [[Utility getGeoFenceRadius] floatValue];
-    CLLocationCoordinate2D circleMiddlePoint = CLLocationCoordinate2DMake(userLocation.coordinate.latitude, userLocation.coordinate.longitude);
-    MKCircle *circle = [MKCircle circleWithCenterCoordinate:circleMiddlePoint radius:fenceDistance];
-    [self.mapView addOverlay: circle];
-    
-    
-    MKPointAnnotation *point;
-    point = [[MKPointAnnotation alloc] init];
-    point.coordinate = userLocation.coordinate;
-    point.title = @"Where am I?";
-    point.subtitle = @"I'm here!!!";
-    [self.mapView addAnnotation:point];*/
 }
 
 
@@ -90,6 +77,7 @@
 -(void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
     [self.mapView removeAnnotations:self.mapView.annotations];
+    [self.mapView removeOverlays:self.mapView.overlays];
 }
 
 /*
