@@ -9,9 +9,10 @@
 #import "ViewController.h"
 #import "AppDelegate.h"
 #import "Utility.h"
-#import "ExtendNSLogFunctionality.h"
+//#import "ExtendNSLogFunctionality.h"
+#import <MessageUI/MessageUI.h>
 
-@interface ViewController (){
+@interface ViewController ()<MFMailComposeViewControllerDelegate>{
 AppDelegate * appDelegate;
 }
 @end
@@ -46,6 +47,8 @@ AppDelegate * appDelegate;
     self.picVw.delegate=self;
     self.picVw.dataSource=self;
     [self.picVw selectRow:selectedAccuracyIndex inComponent:0 animated:YES];
+    self.picVw.layer.borderWidth = 1;
+    self.picVw.layer.borderColor = [UIColor grayColor].CGColor;
     
     //------tableview--------
     self.latLongDic = [[NSMutableDictionary alloc] initWithDictionary:[Utility getLatLongDic]];
@@ -64,6 +67,12 @@ AppDelegate * appDelegate;
     self.hubTableView.delegate=self;
     self.hubTableView.dataSource=self;
     [self.hubTableView reloadData];
+    self.hubTableView.backgroundColor = [UIColor clearColor];
+    
+    //------buttons--------
+    self.locationBtn.layer.cornerRadius = 3;
+    self.addFenceBtn.layer.cornerRadius = 3;
+    self.saveRadiusBtn.layer.cornerRadius = 3;
     
 }
 
@@ -155,7 +164,67 @@ AppDelegate * appDelegate;
 }
 
 - (IBAction)nextOnClick:(id)sender {
-    [self performSegueWithIdentifier:@"goToLog" sender:self];
+    //[self performSegueWithIdentifier:@"goToLog" sender:self];
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *fileName =[NSString stringWithFormat:@"logFile.log"];
+    NSString *logFilePath = [documentsDirectory stringByAppendingPathComponent:fileName];
+    
+    [self emailExport:logFilePath];
+}
+
+- (void)emailExport:(NSString *)filePath
+{
+    if ([MFMailComposeViewController canSendMail]){
+        //App can send mail
+        MFMailComposeViewController *picker = [[MFMailComposeViewController alloc] init];
+        
+        picker.mailComposeDelegate = self;
+        
+        // Set the subject of email
+        [picker setSubject:[NSString stringWithFormat:@"Log File - %@",[NSDate date]]];
+        
+        // Fill out the email body text
+        NSString *emailBody = @"Log File";
+        
+        // This is not an HTML formatted email
+        [picker setMessageBody:emailBody isHTML:NO];
+        
+        // Create NSData object from file
+        NSData *exportFileData = [NSData dataWithContentsOfFile:filePath];
+        
+        NSString *theFileName = [filePath lastPathComponent];//[[filePath lastPathComponent] stringByDeletingPathExtension];
+        
+        // Attach image data to the email
+        [picker addAttachmentData:exportFileData mimeType:@"text/csv" fileName:theFileName];
+        
+        // Show email view
+        [self presentViewController:picker animated:YES completion:NULL];
+    }
+    
+    
+}
+- (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error
+{
+    switch (result) {
+        case MFMailComposeResultSent:
+            [Utility showToast:@"You sent the email."];
+            break;
+        case MFMailComposeResultSaved:
+            [Utility showToast:@"You saved a draft of this email"];
+            break;
+        case MFMailComposeResultCancelled:
+            [Utility showToast:@"You cancelled sending this email."];
+            break;
+        case MFMailComposeResultFailed:
+            [Utility showToast:@"Mail failed:  An error occurred when trying to compose this email"];
+            break;
+        default:
+            [Utility showToast:@"An error occurred when trying to compose this email"];
+            break;
+    }
+    
+    [self dismissViewControllerAnimated:YES completion:NULL];
 }
 
 -(void)saveRadius{

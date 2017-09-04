@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "UIView+Toast.h"
 
 @interface Utility : NSObject
 
@@ -29,5 +30,7 @@
 +(NSString *)getLogStr;
 
 +(void)setLogStr:(NSString *)logStr;
+
++(void)showToast:(NSString *)message;
 
 @end

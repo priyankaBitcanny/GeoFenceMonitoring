@@ -8,7 +8,7 @@
 
 #import "AppDelegate.h"
 #import "Utility.h"
-#import "ExtendNSLogFunctionality.h"
+//#import "ExtendNSLogFunctionality.h"
 
 @interface AppDelegate ()
 
@@ -22,11 +22,11 @@
     // Override point for customization after application launch.
     
     //---------- LOGS SAVED TO FILE ----------------
-    /*NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES);
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
-    NSString *fileName =[NSString stringWithFormat:@"%@.log",[NSDate date]];
+    NSString *fileName =[NSString stringWithFormat:@"logFile.log"];
     NSString *logFilePath = [documentsDirectory stringByAppendingPathComponent:fileName];
-    freopen([logFilePath cStringUsingEncoding:NSASCIIStringEncoding],"a+",stderr);*/
+    freopen([logFilePath cStringUsingEncoding:NSASCIIStringEncoding],"a+",stderr);
     //----------------------------------------------
     
     if(![Utility getGeoFenceRadius]){
@@ -100,7 +100,10 @@
     NSLog(@"initialiseLocationManager");
     self.locationManager = [[CLLocationManager alloc] init];
     [self.locationManager setDelegate:self];
-    self.locationManager.allowsBackgroundLocationUpdates=YES;
+    if ([self.locationManager respondsToSelector:@selector(setAllowsBackgroundLocationUpdates:)]) {
+        [self.locationManager setAllowsBackgroundLocationUpdates:YES];
+    }
+    //self.locationManager.allowsBackgroundLocationUpdates=YES;
     [self setLocationManagerAccuracy];
 }
 
@@ -464,9 +467,9 @@ BOOL CLLocationCoordinateEqual(CLLocationCoordinate2D coordinate1, CLLocationCoo
     CLLocationDistance distance = [regionCenter distanceFromLocation:currentLocation];
     NSLog(@"Calculated distance %@ meters", [NSString stringWithFormat:@"%f",distance]);
     
-    NSString * statusStr = @"exited";
+    NSString * statusStr = @"outside";
     if ([region containsCoordinate:CLLocationCoordinate2DMake(currentLocation.coordinate.latitude, currentLocation.coordinate.longitude)]) {
-        statusStr = @"entered";
+        statusStr = @"inside";
     }
     
     NSMutableDictionary * statusDic = [[NSMutableDictionary alloc] initWithDictionary:[Utility getStatusDic]];
@@ -477,16 +480,18 @@ BOOL CLLocationCoordinateEqual(CLLocationCoordinate2D coordinate1, CLLocationCoo
     });
     NSLog(@"Status Checked : %@ for %@",statusStr,region.identifier);
     
+    NSString * msgStr = [NSString stringWithFormat:@"You are %@ the region of %@" ,statusStr,region.identifier];
     //App is in foreground. Act on it.
     UIApplicationState state = [[UIApplication sharedApplication] applicationState];
     
     if (state == UIApplicationStateActive) {
         //App is in foreground. Act on it.
-        [self showAlertViewWithTitle:@"" andMessage:[NSString stringWithFormat:@"You have %@ the region for %@" ,statusStr,region.identifier]];
+        //[self showAlertViewWithTitle:@"" andMessage:msgStr];
+        [Utility showToast:msgStr];
     }
     else{
         UILocalNotification* localNotification = [[UILocalNotification alloc] init];
-        localNotification.alertBody = [NSString stringWithFormat:@"You have %@ the region for %@",statusStr ,region.identifier];
+        localNotification.alertBody = msgStr;
         localNotification.timeZone = [NSTimeZone defaultTimeZone];
         localNotification.fireDate = [NSDate dateWithTimeIntervalSinceNow:0];
         [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
